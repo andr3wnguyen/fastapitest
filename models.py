@@ -1,7 +1,7 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
-from .database import Base
+from database import Base
 
 
 class Author(Base):
@@ -19,6 +19,6 @@ class Manuscript(Base):
 
     id = Column(Integer, primary_key=True)
     title = Column(String, index=True)
-    author_id = Column(String, ForeignKey("author.id")) #author is uses authors table's id column
+    author_id = Column(String, ForeignKey("authors.id")) #author is uses authors table's id column
 
     author = relationship("Author", back_populates="manuscripts")

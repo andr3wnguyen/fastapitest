@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
-from . import models, schemas
+import models
+import schemas
 
 
 def get_author(db: Session, user_id: int):
@@ -15,8 +16,8 @@ def get_authors(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Author).offset(skip).limit(limit).all()
 
 
-def create_author(db: Session, user: schemas.AuthorCreate):
-    db_user = models.Author(email=user.email)
+def create_author(db: Session, author: schemas.AuthorCreate):
+    db_user = models.Author(email=author.email)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)

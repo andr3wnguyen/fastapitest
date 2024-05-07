@@ -2,38 +2,46 @@ from typing import Union
 
 from fastapi import Request, FastAPI, Depends, HTTPException
 from pydantic import BaseModel
-
+import crud
+import models
+import schemas
 from sqlalchemy.orm import Session
-# from testapp import crud, models, schemas
-# from .database import SessionLocal, engine
+# from . import crud, models, schemas
+from database import SessionLocal, engine
 
 app = FastAPI()
 
-# #db stuff
-# models.Base.metadata.create_all(bind=engine)
+#db stuff
+models.Base.metadata.create_all(bind=engine)
 
-# # Dependency
-# def get_db():
-#     db = SessionLocal()
-#     try:
-#         yield db
-#     finally:
-#         db.close()
+# Dependency
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
-# @app.get("/authors/", response_model=list[schemas.Author])
-# def read_users(skip:int=0, limit:int=100, db:Session = Depends(get_db)):
-#     authors = crud.get_authors(db, skip=skip, limit=limit)
-#     return authors
+@app.get("/authors/", response_model=list[schemas.Author])
+def read_users(skip:int=0, limit:int=100, db:Session = Depends(get_db)):
+    authors = crud.get_authors(db, skip=skip, limit=limit)
+    return authors
 
-# @app.get("/author/{id}", response_model=schemas.Author)
-# def read_author(id:int, db:Session = Depends(get_db)):
-#     author = crud.get_author(db, user_id=id)
-#     if author is None:
-#         raise HTTPException(status_code=404, detail="User not found")
-#     return author
+@app.get("/author/{id}", response_model=schemas.Author)
+def read_author(id:int, db:Session = Depends(get_db)):
+    author = crud.get_author(db, user_id=id)
+    if author is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return author
 
-    
+@app.post("/authors/", response_model=schemas.Author)
+def create_author(author: schemas.Author, db: Session = Depends(get_db)):
+    db_author = crud.get_author_by_email(db, email=author.email)
+    if db_author:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    return crud.create_author(db=db, author=author)
+
 
 
 
